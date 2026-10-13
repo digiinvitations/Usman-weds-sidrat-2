@@ -1,4 +1,4 @@
-import { Heart, Instagram, Settings } from "lucide-react";
+import { Heart, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { WeddingData } from "../types";
 
@@ -19,22 +19,7 @@ export function Footer({ data }: FooterProps) {
         <div className="w-8 h-[1px] bg-wine-dark"></div>
       </div>
       
-      <div className="flex flex-col items-center gap-3 mt-4 text-wine-dark/80 font-serif">
-        <p className="text-xs font-bold tracking-wider uppercase flex items-center gap-2">
-          Created with <Heart className="w-3 h-3 text-pink-accent fill-pink-accent" /> by digiinvitations_
-          <a 
-            href="https://www.instagram.com/digiinvitations_?igsi=MWh1ZnZhMm1xNnNkdw==" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="hover:text-pink-accent transition-colors"
-          >
-            <Instagram className="w-4 h-4" />
-          </a>
-        </p>
-        <p className="text-[10px] tracking-widest font-semibold opacity-70">
-          To Create Yours Contact: - 9456411569
-        </p>
-      </div>
+
 
       <Link 
         to="/admin" 

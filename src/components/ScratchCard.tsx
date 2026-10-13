@@ -9,6 +9,7 @@ import confetti from "canvas-confetti";
 interface ScratchCardProps {
   data: WeddingData;
   onReveal?: () => void;
+  theme?: 'navy' | 'golden';
 }
 
 const heartMaskStyle: React.CSSProperties = {
@@ -28,7 +29,8 @@ interface HeartItem {
   value: string;
 }
 
-export function ScratchCardSection({ data, onReveal }: ScratchCardProps) {
+export function ScratchCardSection({ data, onReveal, theme = 'navy' }: ScratchCardProps) {
+  const isGolden = theme === 'golden';
   // Parse wedding date into separate Date, Month, Year parts (no timing, no day)
   const dateObj = new Date(data.weddingDate || "2026-11-15T11:30");
   const dayNumber = !isNaN(dateObj.getTime()) ? dateObj.getDate().toString() : "15";
@@ -185,7 +187,7 @@ export function ScratchCardSection({ data, onReveal }: ScratchCardProps) {
   }, [rev1, rev2, rev3, onReveal]);
 
   return (
-    <section className="pt-4 pb-4 px-3 bg-[#071629] text-[#FFF9E9] flex flex-col items-center overflow-hidden">
+    <section className={`pt-4 pb-4 px-3 ${isGolden ? 'bg-[#FFF9E9] text-[#142C4C]' : 'bg-[#071629] text-[#FFF9E9]'} flex flex-col items-center overflow-hidden transition-colors duration-500`}>
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -194,13 +196,13 @@ export function ScratchCardSection({ data, onReveal }: ScratchCardProps) {
         className="w-full max-w-md flex flex-col items-center"
       >
         {/* Section Header */}
-        <h2 className="font-script text-3xl sm:text-4xl text-[#E8CD91] text-center drop-shadow-sm">
+        <h2 className={`font-script text-3xl sm:text-4xl ${isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'} text-center drop-shadow-xs`}>
           Scratch to Reveal
         </h2>
 
         <div className="flex items-center justify-center w-full gap-3 mt-1.5 mb-3">
           <div className="h-[1px] w-10 bg-[#D6B66F]"></div>
-          <Heart className="w-3.5 h-3.5 text-[#E8CD91] fill-[#E8CD91] opacity-90" />
+          <Heart className={`w-3.5 h-3.5 ${isGolden ? 'text-[#94691F] fill-[#94691F]' : 'text-[#E8CD91] fill-[#E8CD91]'} opacity-90`} />
           <div className="h-[1px] w-10 bg-[#D6B66F]"></div>
         </div>
 
@@ -223,12 +225,16 @@ export function ScratchCardSection({ data, onReveal }: ScratchCardProps) {
                 style={heartMaskStyle}
               >
                 {/* Revealed Heart Content Underneath */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-1.5 bg-[#102746] border border-[#D6B66F] select-none shadow-soft">
+                <div className={`absolute inset-0 flex flex-col items-center justify-center text-center p-1.5 ${
+                  isGolden 
+                    ? 'bg-[#FFFCF4] border-2 border-[#D6B66F] shadow-sm' 
+                    : 'bg-[#102746] border border-[#D6B66F] shadow-soft'
+                } select-none`}>
                   <div className="flex flex-col items-center justify-center mt-1">
-                    <span className="text-[9px] font-serif uppercase tracking-widest text-[#D6B66F] font-bold">
+                    <span className={`text-[9px] font-serif uppercase tracking-widest ${isGolden ? 'text-[#B88635]' : 'text-[#D6B66F]'} font-bold`}>
                       {item.label}
                     </span>
-                    <span className="font-names font-extrabold text-xl sm:text-2xl text-[#FFF9E9] tracking-wide mt-0.5 leading-none">
+                    <span className={`font-names font-extrabold text-xl sm:text-2xl ${isGolden ? 'text-[#142C4C]' : 'text-[#FFF9E9]'} tracking-wide mt-0.5 leading-none`}>
                       {item.value}
                     </span>
                   </div>
@@ -270,7 +276,7 @@ export function ScratchCardSection({ data, onReveal }: ScratchCardProps) {
 
         {/* Status prompt */}
         {!allRevealed && (
-          <p className="text-[11px] text-[#A2B5CD] font-serif italic mt-2.5 text-center">
+          <p className={`text-[11px] ${isGolden ? 'text-[#77766F]' : 'text-[#A2B5CD]'} font-serif italic mt-2.5 text-center`}>
             Scratch all 3 hearts to reveal the Nikah date & start countdown
           </p>
         )}
@@ -285,18 +291,22 @@ export function ScratchCardSection({ data, onReveal }: ScratchCardProps) {
               transition={{ duration: 0.5 }}
               className="w-full mt-1"
             >
-              <Countdown targetDate={data.weddingDate} hideTitle={false} />
+              <Countdown targetDate={data.weddingDate} hideTitle={false} theme={theme} />
 
               {/* Save The Date Button */}
               <div className="flex flex-col items-center mt-3 mb-1">
                 <button
                   onClick={() => generateIcsFile(data)}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-full font-serif uppercase tracking-widest text-[11px] transition-all font-semibold bg-gradient-to-r from-[#102746] via-[#19385D] to-[#102746] text-[#E8CD91] shadow-lg hover:brightness-110 active:scale-95 border border-[#D6B66F] cursor-pointer"
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-serif uppercase tracking-widest text-[11px] transition-all font-semibold ${
+                    isGolden
+                      ? 'bg-gradient-to-r from-[#B88635] via-[#D6B66F] to-[#B88635] text-[#FFF9E9] shadow-md hover:brightness-105 border border-[#E8CD91]'
+                      : 'bg-gradient-to-r from-[#102746] via-[#19385D] to-[#102746] text-[#E8CD91] shadow-lg hover:brightness-110 border border-[#D6B66F]'
+                  } active:scale-95 cursor-pointer`}
                 >
-                  <Calendar className="w-3.5 h-3.5 text-[#E8CD91]" />
+                  <Calendar className={`w-3.5 h-3.5 ${isGolden ? 'text-[#FFF9E9]' : 'text-[#E8CD91]'}`} />
                   Save The Date
                 </button>
-                <p className="text-[9px] uppercase tracking-widest text-[#A2B5CD] mt-2 font-semibold">
+                <p className={`text-[9px] uppercase tracking-widest ${isGolden ? 'text-[#77766F]' : 'text-[#A2B5CD]'} mt-2 font-semibold`}>
                   Add this event to your calendar
                 </p>
               </div>

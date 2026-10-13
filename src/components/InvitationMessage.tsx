@@ -5,25 +5,31 @@ interface SectionProps {
   data?: WeddingData;
   message?: string;
   isHeroEnded?: boolean;
+  theme?: 'navy' | 'golden';
 }
 
 /**
  * 1. Quranic Verse Section ("And We created you in pairs", Surah An-Naba • 78:8)
  * Rendered directly below Hero and above Scratch Card.
  */
-export function QuranicVerseSection({ data }: SectionProps) {
+export function QuranicVerseSection({ data, theme = 'navy' }: SectionProps) {
+  const isGolden = theme === 'golden';
   const quranicArabic = data?.quranicVerse?.arabic || "وَخَلَقْنَـٰكُمْ\nأَزْوَٰجًۭا";
   const quranicTranslation = data?.quranicVerse?.translation || "And We created you in pairs";
 
   return (
     <section 
       id="quranic-message-section"
-      className="relative px-4 pt-20 pb-8 bg-[#071629] text-[#FFF9E9] flex flex-col items-center text-center overflow-hidden"
+      className={`relative px-4 pt-20 pb-8 ${isGolden ? 'bg-[#FFF9E9] text-[#142C4C]' : 'bg-[#071629] text-[#FFF9E9]'} flex flex-col items-center text-center overflow-hidden transition-colors duration-500`}
     >
       {/* Upward side shading equal in colour & capacity to the hero section downside */}
-      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#071629] via-[#071629]/75 to-transparent pointer-events-none z-0" />
+      <div 
+        className={`absolute inset-x-0 top-0 h-40 bg-gradient-to-b ${
+          isGolden ? 'from-[#FFF9E9] via-[#FFF9E9]/75 to-transparent' : 'from-[#071629] via-[#071629]/75 to-transparent'
+        } pointer-events-none z-0`} 
+      />
       {/* Soft warm gold ambient glow centered behind verse */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(184,134,53,0.1)_0%,transparent_75%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(184,134,53,0.12)_0%,transparent_75%)] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 15 }}
@@ -35,7 +41,7 @@ export function QuranicVerseSection({ data }: SectionProps) {
         {/* Top Decorative Motif in Ornamental Gold */}
         <div className="flex items-center justify-center w-full gap-3 mb-2">
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#E8CD91] to-[#B88635]" />
-          <span className="text-[#E8CD91] text-xs font-serif tracking-widest font-semibold">﷽</span>
+          <span className={`text-xs font-serif tracking-widest font-semibold ${isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'}`}>﷽</span>
           <div className="h-[1px] w-12 bg-gradient-to-l from-transparent via-[#E8CD91] to-[#B88635]" />
         </div>
 
@@ -43,15 +49,17 @@ export function QuranicVerseSection({ data }: SectionProps) {
         <div className="flex flex-col items-center px-2">
           <p 
             dir="rtl" 
-            className="font-serif text-2xl md:text-3xl text-[#E8CD91] font-bold leading-relaxed whitespace-pre-line tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]"
+            className={`font-serif text-2xl md:text-3xl ${
+              isGolden ? 'text-[#94691F] drop-shadow-[0_1px_3px_rgba(184,134,53,0.2)]' : 'text-[#E8CD91] drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]'
+            } font-bold leading-relaxed whitespace-pre-line tracking-wide`}
             style={{ fontFamily: "'Amiri', 'Cormorant Garamond', serif" }}
           >
             {quranicArabic}
           </p>
-          <p className="font-serif italic text-sm md:text-base text-[#FFF9E9] mt-2 tracking-wide font-medium drop-shadow-xs">
+          <p className={`font-serif italic text-sm md:text-base ${isGolden ? 'text-[#142C4C]' : 'text-[#FFF9E9]'} mt-2 tracking-wide font-medium drop-shadow-xs`}>
             "{quranicTranslation}"
           </p>
-          <span className="text-[10px] uppercase font-serif tracking-[0.25em] text-[#D6B66F] mt-1 font-semibold">
+          <span className={`text-[10px] uppercase font-serif tracking-[0.25em] ${isGolden ? 'text-[#B88635]' : 'text-[#D6B66F]'} mt-1 font-semibold`}>
             Surah An-Naba • 78:8
           </span>
         </div>
@@ -59,7 +67,7 @@ export function QuranicVerseSection({ data }: SectionProps) {
         {/* Bottom subtle divider to transition into Scratch Card */}
         <div className="flex items-center justify-center w-full gap-3 mt-4">
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#D6B66F]" />
-          <div className="w-1.5 h-1.5 rotate-45 bg-[#E8CD91]" />
+          <div className={`w-1.5 h-1.5 rotate-45 ${isGolden ? 'bg-[#94691F]' : 'bg-[#E8CD91]'}`} />
           <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#D6B66F]" />
         </div>
       </motion.div>
@@ -71,7 +79,8 @@ export function QuranicVerseSection({ data }: SectionProps) {
  * 2. Message Section, Couple Names, Logo & Closing Message at the End of Website
  * Concludes with Groom & Bride names, couple's monogram logo, and closing message line.
  */
-export function ClosingBlessingAndLogo({ data, message }: SectionProps) {
+export function ClosingBlessingAndLogo({ data, message, theme = 'navy' }: SectionProps) {
+  const isGolden = theme === 'golden';
   const customText = data?.customText || "(US)";
   const invitationMsg = message || data?.invitationMessage || "بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ\nMay Allah bless you and send blessings upon you. and bring goodness between you.";
 
@@ -86,7 +95,7 @@ export function ClosingBlessingAndLogo({ data, message }: SectionProps) {
   const closingLine = data?.closingMessage || defaultClosingPrayer;
 
   return (
-    <section className="relative px-4 pt-4 pb-4 bg-[#071629] text-[#FFF9E9] flex flex-col items-center text-center">
+    <section className={`relative px-4 pt-4 pb-4 ${isGolden ? 'bg-[#FFF9E9] text-[#142C4C]' : 'bg-[#071629] text-[#FFF9E9]'} flex flex-col items-center text-center transition-colors duration-500`}>
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -97,7 +106,7 @@ export function ClosingBlessingAndLogo({ data, message }: SectionProps) {
         {/* Top Divider */}
         <div className="flex items-center justify-center w-full gap-3 mb-3">
           <div className="h-[1px] w-14 bg-gradient-to-r from-transparent via-[#D6B66F] to-[#B88635]" />
-          <div className="w-1.5 h-1.5 rotate-45 bg-[#E8CD91]" />
+          <div className={`w-1.5 h-1.5 rotate-45 ${isGolden ? 'bg-[#94691F]' : 'bg-[#E8CD91]'}`} />
           <div className="h-[1px] w-14 bg-gradient-to-l from-transparent via-[#D6B66F] to-[#B88635]" />
         </div>
 
@@ -105,33 +114,39 @@ export function ClosingBlessingAndLogo({ data, message }: SectionProps) {
         <div className="flex flex-col items-center px-2 mb-3">
           <p 
             dir="rtl" 
-            className="font-serif text-lg md:text-xl text-[#E8CD91] font-bold leading-relaxed tracking-wide mb-1.5 drop-shadow-sm"
+            className={`font-serif text-lg md:text-xl ${
+              isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'
+            } font-bold leading-relaxed tracking-wide mb-1.5 drop-shadow-xs`}
             style={{ fontFamily: "'Amiri', 'Cormorant Garamond', serif" }}
           >
             {arabicLine}
           </p>
-          <p className="font-serif text-xs md:text-sm text-[#FFF9E9]/90 leading-relaxed italic max-w-sm whitespace-pre-line">
+          <p className={`font-serif text-xs md:text-sm ${isGolden ? 'text-[#43536A]' : 'text-[#FFF9E9]/90'} leading-relaxed italic max-w-sm whitespace-pre-line`}>
             {englishLine}
           </p>
         </div>
 
         {/* GROOM AND BRIDE NAMES AT END OF WEBSITE */}
-        <div className="w-full max-w-xs my-2.5 px-4 py-3.5 rounded-2xl bg-[#102746]/85 border border-[#D6B66F]/70 shadow-soft backdrop-blur-md flex flex-col items-center">
-          <span className="text-[9px] uppercase font-serif tracking-[0.25em] text-[#D6B66F] font-bold mb-1">
+        <div className={`w-full max-w-xs my-2.5 px-4 py-3.5 rounded-2xl ${
+          isGolden 
+            ? 'bg-[#FFFCF4] border-2 border-[#D6B66F] shadow-md' 
+            : 'bg-[#102746]/85 border border-[#D6B66F]/70 shadow-soft'
+        } backdrop-blur-md flex flex-col items-center`}>
+          <span className={`text-[9px] uppercase font-serif tracking-[0.25em] ${isGolden ? 'text-[#94691F]' : 'text-[#D6B66F]'} font-bold mb-1`}>
             The Blessed Union Of
           </span>
           <div className="flex flex-col items-center text-center">
-            <span className="font-serif font-bold text-base sm:text-lg text-[#FFF9E9] tracking-wide">
+            <span className={`font-serif font-bold text-base sm:text-lg ${isGolden ? 'text-[#142C4C]' : 'text-[#FFF9E9]'} tracking-wide`}>
               {groomName}
             </span>
-            <span className="font-serif text-[11px] text-[#D6B66F] italic my-0.5">
+            <span className={`font-serif text-[11px] ${isGolden ? 'text-[#B88635]' : 'text-[#D6B66F]'} italic my-0.5`}>
               (Groom)
             </span>
-            <span className="font-script text-xl text-[#E8CD91] my-0.5">&</span>
-            <span className="font-serif font-bold text-base sm:text-lg text-[#FFF9E9] tracking-wide">
+            <span className={`font-script text-xl ${isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'} my-0.5`}>&amp;</span>
+            <span className={`font-serif font-bold text-base sm:text-lg ${isGolden ? 'text-[#142C4C]' : 'text-[#FFF9E9]'} tracking-wide`}>
               {brideName}
             </span>
-            <span className="font-serif text-[11px] text-[#D6B66F] italic mt-0.5">
+            <span className={`font-serif text-[11px] ${isGolden ? 'text-[#B88635]' : 'text-[#D6B66F]'} italic mt-0.5`}>
               (Bride)
             </span>
           </div>
@@ -140,7 +155,7 @@ export function ClosingBlessingAndLogo({ data, message }: SectionProps) {
         {/* Divider before Signature Logo */}
         <div className="flex items-center justify-center w-full gap-3 my-2">
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#D6B66F]" />
-          <div className="w-1.5 h-1.5 rotate-45 bg-[#E8CD91]" />
+          <div className={`w-1.5 h-1.5 rotate-45 ${isGolden ? 'bg-[#94691F]' : 'bg-[#E8CD91]'}`} />
           <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#D6B66F]" />
         </div>
 
@@ -161,8 +176,10 @@ export function ClosingBlessingAndLogo({ data, message }: SectionProps) {
               />
             </div>
           ) : (
-            <div className="relative px-8 py-3 rounded-full border border-[#D6B66F]/70 bg-[#102746]/85 shadow-soft flex items-center justify-center backdrop-blur-md">
-              <span className="font-serif text-3xl sm:text-4xl font-bold tracking-[0.2em] text-[#E8CD91]">
+            <div className={`relative px-8 py-3 rounded-full border ${
+              isGolden ? 'border-[#D6B66F] bg-[#FFFCF4] shadow-md' : 'border-[#D6B66F]/70 bg-[#102746]/85 shadow-soft'
+            } flex items-center justify-center backdrop-blur-md`}>
+              <span className={`font-serif text-3xl sm:text-4xl font-bold tracking-[0.2em] ${isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'}`}>
                 {customText}
               </span>
             </div>
@@ -171,7 +188,7 @@ export function ClosingBlessingAndLogo({ data, message }: SectionProps) {
 
         {/* SMALL CLOSING MESSAGE LINE JUST BELOW THE LOGO IN THE END */}
         {closingLine && (
-          <p className="font-serif italic text-xs sm:text-sm text-[#FFF9E9]/90 text-center max-w-xs mt-2 leading-relaxed whitespace-pre-line px-2">
+          <p className={`font-serif italic text-xs sm:text-sm ${isGolden ? 'text-[#43536A]' : 'text-[#FFF9E9]/90'} text-center max-w-xs mt-2 leading-relaxed whitespace-pre-line px-2`}>
             {closingLine}
           </p>
         )}
@@ -179,7 +196,7 @@ export function ClosingBlessingAndLogo({ data, message }: SectionProps) {
         {/* Bottom Decorative Motif */}
         <div className="flex items-center justify-center w-full gap-3 mt-3">
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-[#D6B66F] to-[#B88635]" />
-          <div className="w-1.5 h-1.5 rotate-45 bg-[#E8CD91]" />
+          <div className={`w-1.5 h-1.5 rotate-45 ${isGolden ? 'bg-[#94691F]' : 'bg-[#E8CD91]'}`} />
           <div className="h-[1px] w-12 bg-gradient-to-l from-transparent via-[#D6B66F] to-[#B88635]" />
         </div>
       </motion.div>

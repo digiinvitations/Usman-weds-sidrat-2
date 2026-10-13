@@ -95,6 +95,7 @@ export interface WeddingData {
   musicUrl: string;
   closingMessage: string;
   templateName?: string;
+  colorTheme?: 'navy' | 'golden';
   isRemix?: boolean;
   remixSlotId?: string;
   lastUpdated?: string;

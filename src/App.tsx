@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { Settings, Mail } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { Hero } from './components/Hero';
 import { QuranicVerseSection, ClosingBlessingAndLogo } from './components/InvitationMessage';
-import { MusicControl } from './components/MusicControl';
+import { MusicControl, MusicControlHandle } from './components/MusicControl';
 import { ScratchCardSection } from './components/ScratchCard';
 import { Venue } from './components/Venue';
 import { GoldenPetals } from './components/GoldenPetals';
@@ -18,7 +18,17 @@ function PublicView() {
   const [viewState, setViewState] = useState<'thumbnail' | 'opening-video' | 'main'>('thumbnail');
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isHeroEnded, setIsHeroEnded] = useState(true);
-  const openingVideoRef = React.useRef<HTMLVideoElement>(null);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  
+  // Theme state: allows recovering earlier Golden Theme or staying in Royal Navy Blue
+  const [theme, setTheme] = useState<'navy' | 'golden'>(() => {
+    const saved = localStorage.getItem('wedding_theme');
+    if (saved === 'golden' || saved === 'navy') return saved;
+    return 'navy';
+  });
+
+  const openingVideoRef = useRef<HTMLVideoElement>(null);
+  const musicControlRef = useRef<MusicControlHandle>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -29,9 +39,17 @@ function PublicView() {
         dbData.musicUrl = "https://www.image2url.com/r2/default/audio/1788064469832-bf9b7150-96e8-40a9-aa58-a25cddf491c7.mp3";
       }
 
-      // Ensure royal video card is active for hero section
-      dbData.heroDisplayMode = 'video_with_text';
+      // Default to video_with_text only if not set, respecting photo mode chosen in admin panel
+      if (!dbData.heroDisplayMode) {
+        dbData.heroDisplayMode = 'video_with_text';
+      }
       
+      // Respect colorTheme set by admin
+      if (dbData.colorTheme) {
+        setTheme(dbData.colorTheme);
+        localStorage.setItem('wedding_theme', dbData.colorTheme);
+      }
+
       setData(dbData);
 
       // Determine initial view: Opening Thumbnail -> Opening Video -> Main
@@ -52,7 +70,18 @@ function PublicView() {
     }
   }, [data?.openingVideoUrl]);
 
+  /**
+   * User clicks anywhere on the opening video thumbnail:
+   * 1. Music starts playing IMMEDIATELY on this user gesture
+   * 2. Opening video starts playing
+   */
   const handleThumbnailClick = () => {
+    // Start background music immediately on user gesture
+    if (musicControlRef.current) {
+      musicControlRef.current.play();
+    }
+    setIsMusicPlaying(true);
+
     if (viewState === 'opening-video') {
       setViewState('main');
       return;
@@ -63,26 +92,17 @@ function PublicView() {
       setIsVideoPlaying(false);
       if (openingVideoRef.current) {
         openingVideoRef.current.currentTime = 0;
-        openingVideoRef.current.muted = false;
+        // Keep opening video muted so background music plays crystal clear without audio clashing
+        openingVideoRef.current.muted = true;
         const playPromise = openingVideoRef.current.play();
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
               setIsVideoPlaying(true);
             })
-            .catch(() => {
-              // If unmuted playback is restricted by browser, fallback to muted
-              if (openingVideoRef.current) {
-                openingVideoRef.current.muted = true;
-                openingVideoRef.current.play()
-                  .then(() => setIsVideoPlaying(true))
-                  .catch((err) => {
-                    console.error("Video playback failed", err);
-                    setViewState('main');
-                  });
-              } else {
-                setViewState('main');
-              }
+            .catch((err) => {
+              console.error("Video playback failed", err);
+              setViewState('main');
             });
         }
       }
@@ -90,6 +110,17 @@ function PublicView() {
       setViewState('main');
     }
   };
+
+  const handleVideoOverlayClick = () => {
+    // If music hasn't started yet, ensure it starts
+    if (musicControlRef.current) {
+      musicControlRef.current.play();
+    }
+    setIsMusicPlaying(true);
+    setViewState('main');
+  };
+
+
 
   useEffect(() => {
     if (data?.ogImageUrl) {
@@ -126,69 +157,57 @@ function PublicView() {
     return <Preloader data={data} onComplete={() => setIsPreloading(false)} />;
   }
 
+  const isGolden = theme === 'golden';
+
   return (
-    <div className={`w-full bg-[#071629] relative mx-auto max-w-md shadow-2xl overflow-hidden sm:my-0 ${viewState !== 'main' ? 'h-[100svh]' : 'min-h-[100svh]'}`}>
+    <div className={`w-full ${isGolden ? 'bg-[#FFF9E9]' : 'bg-[#071629]'} relative mx-auto max-w-md shadow-2xl overflow-hidden sm:my-0 ${viewState !== 'main' ? 'h-[100svh]' : 'min-h-[100svh]'} transition-colors duration-500`}>
       
       {/* Golden Petals Animation: Constant, gentle drifting from top of website */}
       <GoldenPetals />
 
       {/* Audio player remains mounted across transitions */}
-      <MusicControl musicUrl={data.musicUrl} shouldPlay={viewState === 'main'} />
+      <MusicControl 
+        ref={musicControlRef} 
+        musicUrl={data.musicUrl} 
+        shouldPlay={isMusicPlaying || viewState === 'main'} 
+        theme={theme}
+      />
 
-      {/* Main Content Flow: Very slight gap between sections */}
-      <main className="w-full min-h-[100svh] bg-[#071629] relative overflow-hidden pb-3">
+
+
+      {/* Main Content Flow: Seamless transition between sections */}
+      <main className={`w-full min-h-[100svh] ${isGolden ? 'bg-[#FFF9E9]' : 'bg-[#071629]'} relative overflow-hidden pb-3 transition-colors duration-500`}>
         {/* 1. Hero Section (Royal Video Card with Invitation Details) */}
         <Hero 
           data={data} 
           shouldPlayVideo={viewState === 'main'}
           onVideoEnd={() => setIsHeroEnded(true)}
+          theme={theme}
         />
 
         {/* 2. Quranic Verse Section ("And We created you in pairs", Surah An-Naba • 78:8) */}
-        <QuranicVerseSection data={data} isHeroEnded={isHeroEnded} />
+        <QuranicVerseSection data={data} isHeroEnded={isHeroEnded} theme={theme} />
 
         {/* 3. Scratch Card Section (3 Hearts with Countdown revealed on scratch) */}
-        <ScratchCardSection data={data} />
+        <ScratchCardSection data={data} theme={theme} />
 
         {/* 4. Venue Section (Unhidden & rearranged just below the scratch card countdown) */}
-        <Venue venue={data.venue} />
+        <Venue venue={data.venue} theme={theme} />
 
         {/* 5. Wedding Invitation Blessing Message, Groom & Bride Names, Logo and Closing Message */}
-        <ClosingBlessingAndLogo data={data} message={data.invitationMessage} />
+        <ClosingBlessingAndLogo data={data} message={data.invitationMessage} theme={theme} />
 
-        {/* 6. Admin Panel Button & Very Small Advertisement Box at the end of website */}
-        <footer className="w-full pt-4 pb-6 px-4 flex flex-col items-center justify-center gap-2.5 bg-[#071629]">
-          {/* Small Advertisement Box with WhatsApp */}
-          <a 
-            href="https://wa.me/919456411569?text=Hello%2C%20I%20would%20like%20to%20inquire%20about%20a%20wedding%20invitation%20website" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full max-w-[280px] p-2.5 rounded-xl border border-[#D6B66F]/50 bg-[#102746]/80 text-center opacity-70 hover:opacity-100 transition-opacity duration-300 backdrop-blur-md shadow-soft group cursor-pointer block"
-            title="Contact on WhatsApp"
-          >
-            <p className="text-[10px] font-serif text-[#FFF9E9] tracking-wide leading-tight">
-              Website designed &amp; developed with care
-            </p>
-            <div className="flex items-center justify-center gap-1.5 mt-1.5">
-              <svg 
-                className="w-3.5 h-3.5 text-[#25D366] fill-current" 
-                viewBox="0 0 24 24"
-              >
-                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-              </svg>
-              <span className="text-[11px] font-sans font-semibold text-[#E8CD91] group-hover:text-[#FFF9E9] tracking-wider">
-                9456411569
-              </span>
-            </div>
-          </a>
-
+        {/* 6. Subtle Admin Link Footer (No advertisement, no theme switcher) */}
+        <footer className={`w-full pt-4 pb-8 px-4 flex flex-col items-center justify-center ${isGolden ? 'bg-[#FFF9E9]' : 'bg-[#071629]'} transition-colors duration-500`}>
           <Link
             to="/admin"
-            className="opacity-40 hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-1.5 text-[11px] font-serif tracking-wider text-[#A2B5CD] hover:text-[#E8CD91] py-1 px-3 rounded-full hover:bg-[#102746]"
+            className={`opacity-40 hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-1.5 text-[11px] font-serif tracking-wider ${
+              isGolden ? 'text-[#77766F] hover:text-[#94691F] hover:bg-[#F5EBD2]' : 'text-[#A2B5CD] hover:text-[#E8CD91] hover:bg-[#102746]'
+            } py-1.5 px-3 rounded-full`}
             title="Admin Panel"
             aria-label="Admin Panel"
           >
-            <Settings className="w-3.5 h-3.5 text-[#E8CD91]" />
+            <Settings className={`w-3.5 h-3.5 ${isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'}`} />
             <span>Admin</span>
           </Link>
         </footer>
@@ -198,13 +217,14 @@ function PublicView() {
       {data.openingVideoUrl && (
         <div 
           className={`absolute inset-0 z-[9998] bg-[#071629] flex items-center justify-center transition-opacity duration-500 ease-in-out ${viewState === 'opening-video' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-          onClick={() => setViewState('main')}
+          onClick={handleVideoOverlayClick}
         >
           <video
             ref={openingVideoRef}
             src={data.openingVideoUrl}
             playsInline
             preload="auto"
+            muted
             onLoadedData={() => {
               if (viewState === 'opening-video') setIsVideoPlaying(true);
             }}
@@ -217,7 +237,7 @@ function PublicView() {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setViewState('main');
+                handleVideoOverlayClick();
               }}
               className="absolute top-4 right-4 z-[10000] px-3.5 py-1.5 rounded-full bg-[#071629]/80 border border-[#D6B66F]/60 text-[11px] font-serif text-[#FFF9E9] hover:bg-[#102746] backdrop-blur-md transition-all shadow-md cursor-pointer"
             >
@@ -227,7 +247,7 @@ function PublicView() {
         </div>
       )}
 
-      {/* Thumbnail Overlay (z-[9999]) */}
+      {/* Thumbnail Overlay (z-[9999]) - Clicking anywhere starts background music and plays video */}
       {data.openingThumbnailUrl && (
         <div 
           className={`absolute inset-0 z-[9999] bg-[#071629] flex flex-col items-center justify-center cursor-pointer transition-opacity duration-700 ease-in-out ${viewState === 'thumbnail' || (viewState === 'opening-video' && !isVideoPlaying) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}

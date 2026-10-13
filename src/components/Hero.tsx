@@ -8,9 +8,11 @@ interface HeroProps {
   shouldPlayVideo?: boolean;
   onVideoEnd?: () => void;
   onToggleDisplayMode?: (mode: "video_with_text" | "photo") => void;
+  theme?: 'navy' | 'golden';
 }
 
-export function Hero({ data, onVideoEnd, shouldPlayVideo = true }: HeroProps) {
+export function Hero({ data, onVideoEnd, shouldPlayVideo = true, theme = 'navy' }: HeroProps) {
+  const isGolden = theme === 'golden';
   // Royal video card with text is the default presentation
   const [displayMode, setDisplayMode] = useState<"video_with_text" | "photo">(
     data.heroDisplayMode || "video_with_text"
@@ -93,7 +95,7 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true }: HeroProps) {
   return (
     <section 
       onClick={() => { if (!isRevealed) setIsRevealed(true); }}
-      className="relative min-h-[100svh] w-full flex flex-col items-center justify-between overflow-hidden bg-[#071629] text-[#FFF9E9]"
+      className={`relative min-h-[100svh] w-full flex flex-col items-center justify-between overflow-hidden ${isGolden ? 'bg-[#FFF9E9]' : 'bg-[#071629]'} text-[#FFF9E9]`}
     >
 
       <AnimatePresence mode="wait">
@@ -137,12 +139,12 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true }: HeroProps) {
                 className="w-full h-full object-cover object-center scale-105"
               />
 
-              {/* Light Royal Navy Gradient Shading: appears smoothly after 3 seconds of video */}
+              {/* Gradient Shading: appears smoothly after 3 seconds of video */}
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isRevealed ? 1 : 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
-                className="absolute inset-0 bg-gradient-to-b from-[#071629]/55 via-[#102746]/40 to-[#071629]/70 pointer-events-none" 
+                className={`absolute inset-0 ${isGolden ? 'bg-gradient-to-b from-black/40 via-amber-950/20 to-black/60' : 'bg-gradient-to-b from-[#071629]/55 via-[#102746]/40 to-[#071629]/70'} pointer-events-none`} 
               />
 
               {/* Slight Warm Gold Ambient Shading to match website color theme */}
@@ -155,7 +157,7 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true }: HeroProps) {
 
               {/* Downward shading equal in colour & capacity to the message section upward shading */}
               <div 
-                className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent via-[#071629]/75 to-[#071629] pointer-events-none z-10" 
+                className={`absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent ${isGolden ? 'via-[#FFF9E9]/75 to-[#FFF9E9]' : 'via-[#071629]/75 to-[#071629]'} pointer-events-none z-10`} 
               />
             </div>
 
@@ -303,11 +305,15 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true }: HeroProps) {
                   }}
                   animate={{ y: [0, 6, 0] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-10 h-10 rounded-full bg-[#102746]/95 hover:bg-[#19385D] backdrop-blur-md border border-[#E8CD91] flex items-center justify-center text-[#E8CD91] shadow-[0_4px_16px_rgba(0,0,0,0.6)] cursor-pointer transition-all active:scale-95"
+                  className={`w-10 h-10 rounded-full ${
+                    isGolden 
+                      ? 'bg-[#FFFCF4] border-2 border-[#D6B66F] text-[#94691F] shadow-[0_4px_16px_rgba(184,134,53,0.35)] hover:bg-[#F5EBD2]' 
+                      : 'bg-[#102746]/95 hover:bg-[#19385D] border border-[#E8CD91] text-[#E8CD91] shadow-[0_4px_16px_rgba(0,0,0,0.6)]'
+                  } backdrop-blur-md flex items-center justify-center cursor-pointer transition-all active:scale-95`}
                   title="Scroll to Invitation Message"
                   aria-label="Scroll to Invitation Message"
                 >
-                  <ArrowDown className="w-4 h-4 text-[#E8CD91]" strokeWidth={2.5} />
+                  <ArrowDown className={`w-4 h-4 ${isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'}`} strokeWidth={2.5} />
                 </motion.button>
               </div>
 
@@ -323,10 +329,10 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true }: HeroProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
-            className="relative w-full min-h-[100svh] flex flex-col items-center justify-between overflow-hidden bg-[#071629]"
+            className={`relative w-full min-h-[100svh] flex flex-col items-center justify-between overflow-hidden ${isGolden ? 'bg-[#FFF9E9]' : 'bg-[#071629]'}`}
           >
             {/* Full Hero Photo with ambient animation */}
-            <div className="absolute inset-0 z-0 overflow-hidden bg-[#071629]">
+            <div className={`absolute inset-0 z-0 overflow-hidden ${isGolden ? 'bg-[#FFF9E9]' : 'bg-[#071629]'}`}>
               <motion.div
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ 
@@ -348,7 +354,7 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true }: HeroProps) {
 
               {/* Subtle top vignette & bottom transition shade matching message section */}
               <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
-              <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-b from-transparent via-[#071629]/75 to-[#071629] pointer-events-none z-10" />
+              <div className={`absolute bottom-0 inset-x-0 h-40 bg-gradient-to-b from-transparent ${isGolden ? 'via-[#FFF9E9]/75 to-[#FFF9E9]' : 'via-[#071629]/75 to-[#071629]'} pointer-events-none z-10`} />
             </div>
 
             {/* Spacer */}
@@ -369,11 +375,15 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true }: HeroProps) {
                 }}
                 animate={{ y: [0, 6, 0] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                className="w-10 h-10 rounded-full bg-[#102746]/95 hover:bg-[#19385D] backdrop-blur-md border border-[#E8CD91] flex items-center justify-center text-[#E8CD91] shadow-[0_4px_16px_rgba(0,0,0,0.6)] cursor-pointer transition-all active:scale-95"
+                className={`w-10 h-10 rounded-full ${
+                  isGolden 
+                    ? 'bg-[#FFFCF4] border-2 border-[#D6B66F] text-[#94691F] shadow-[0_4px_16px_rgba(184,134,53,0.35)] hover:bg-[#F5EBD2]' 
+                    : 'bg-[#102746]/95 hover:bg-[#19385D] border border-[#E8CD91] text-[#E8CD91] shadow-[0_4px_16px_rgba(0,0,0,0.6)]'
+                } backdrop-blur-md flex items-center justify-center cursor-pointer transition-all active:scale-95`}
                 title="Scroll to Invitation Message"
                 aria-label="Scroll to Invitation Message"
               >
-                <ArrowDown className="w-4 h-4 text-[#E8CD91]" strokeWidth={2.5} />
+                <ArrowDown className={`w-4 h-4 ${isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'}`} strokeWidth={2.5} />
               </motion.button>
             </div>
           </motion.div>

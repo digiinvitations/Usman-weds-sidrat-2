@@ -382,6 +382,7 @@ function ensureUsmanAndSidratData(data: WeddingData): WeddingData {
     heroVideoUrl: data.heroVideoUrl || defaultData.heroVideoUrl || "https://www.image2url.com/r2/default/videos/1788011182513-3d74480d-c3ef-41df-926f-d21988765de3.mp4",
     openingThumbnailUrl: data.openingThumbnailUrl || defaultData.openingThumbnailUrl || "https://cdn.phototourl.com/member/2026-10-13-4d95056f-808f-438a-a87d-b923a3073f87.png",
     openingVideoUrl: data.openingVideoUrl || defaultData.openingVideoUrl || "https://videotourl.com/videos/1791863422409-e1b895a9-4737-40fd-a055-b9fe88922013.mp4",
+    colorTheme: data.colorTheme || defaultData.colorTheme || 'navy',
     customText,
     closingMessage
   };

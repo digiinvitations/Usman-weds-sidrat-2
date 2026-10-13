@@ -5,9 +5,11 @@ import { HeartDivider } from "./HeartDivider";
 interface CountdownProps {
   targetDate: string;
   hideTitle?: boolean;
+  theme?: 'navy' | 'golden';
 }
 
-export function Countdown({ targetDate, hideTitle = false }: CountdownProps) {
+export function Countdown({ targetDate, hideTitle = false, theme = 'navy' }: CountdownProps) {
+  const isGolden = theme === 'golden';
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -48,7 +50,7 @@ export function Countdown({ targetDate, hideTitle = false }: CountdownProps) {
       >
         {!hideTitle && (
           <>
-            <h3 className="font-script text-2xl sm:text-3xl text-[#E8CD91] text-center drop-shadow-sm">
+            <h3 className={`font-script text-2xl sm:text-3xl ${isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'} text-center drop-shadow-xs`}>
               Counting Down to Forever
             </h3>
             <HeartDivider />
@@ -57,15 +59,15 @@ export function Countdown({ targetDate, hideTitle = false }: CountdownProps) {
 
         {!isEnded ? (
           <div className="flex justify-between items-center w-full gap-2 sm:gap-3 px-1 mt-1">
-            <TimeUnit value={timeLeft.days} label="DAYS" />
-            <TimeUnit value={timeLeft.hours} label="HOURS" />
-            <TimeUnit value={timeLeft.minutes} label="MINS" />
-            <TimeUnit value={timeLeft.seconds} label="SECS" />
+            <TimeUnit value={timeLeft.days} label="DAYS" isGolden={isGolden} />
+            <TimeUnit value={timeLeft.hours} label="HOURS" isGolden={isGolden} />
+            <TimeUnit value={timeLeft.minutes} label="MINS" isGolden={isGolden} />
+            <TimeUnit value={timeLeft.seconds} label="SECS" isGolden={isGolden} />
           </div>
         ) : (
-          <div className="text-center p-4 border border-[#D6B66F] rounded-xl bg-[#102746] mt-1 shadow-md">
-            <h3 className="font-script text-2xl text-[#E8CD91] mb-1">Today is the Blessed Day!</h3>
-            <p className="text-[11px] text-[#FFF9E9] uppercase tracking-widest font-semibold">Let the celebration begin</p>
+          <div className={`text-center p-4 border border-[#D6B66F] rounded-xl ${isGolden ? 'bg-[#FFFCF4]' : 'bg-[#102746]'} mt-1 shadow-md`}>
+            <h3 className={`font-script text-2xl ${isGolden ? 'text-[#94691F]' : 'text-[#E8CD91]'} mb-1`}>Today is the Blessed Day!</h3>
+            <p className={`text-[11px] ${isGolden ? 'text-[#142C4C]' : 'text-[#FFF9E9]'} uppercase tracking-widest font-semibold`}>Let the celebration begin</p>
           </div>
         )}
       </motion.div>
@@ -73,17 +75,21 @@ export function Countdown({ targetDate, hideTitle = false }: CountdownProps) {
   );
 }
 
-function TimeUnit({ value, label }: { value: number; label: string }) {
+function TimeUnit({ value, label, isGolden }: { value: number; label: string; isGolden: boolean }) {
   const formattedValue = value.toString().padStart(2, "0");
   
   return (
     <div className="flex flex-col items-center w-1/4">
-      <div className="w-full aspect-square bg-[#102746] rounded-xl border border-[#D6B66F] flex items-center justify-center shadow-soft mb-1 transition-transform hover:scale-105">
-        <span className="font-serif font-bold text-lg sm:text-2xl text-[#FFF9E9]">
+      <div className={`w-full aspect-square ${
+        isGolden 
+          ? 'bg-[#FFFCF4] border-2 border-[#D6B66F] shadow-sm' 
+          : 'bg-[#102746] border border-[#D6B66F] shadow-soft'
+      } rounded-xl flex items-center justify-center mb-1 transition-transform hover:scale-105`}>
+        <span className={`font-serif font-bold text-lg sm:text-2xl ${isGolden ? 'text-[#142C4C]' : 'text-[#FFF9E9]'}`}>
           {formattedValue}
         </span>
       </div>
-      <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-[#D6B66F] font-bold">
+      <span className={`text-[9px] sm:text-[10px] uppercase tracking-widest ${isGolden ? 'text-[#B88635]' : 'text-[#D6B66F]'} font-bold`}>
         {label}
       </span>
     </div>
