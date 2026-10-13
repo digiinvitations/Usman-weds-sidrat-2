@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+:root {
+  /* Royal Navy */
+  --color-navy: #102746;
+  --color-navy-deep: #071629;
+  --color-navy-light: #19385D;
+
+  /* Antique Gold */
+  --color-gold: #B88635;
+  --color-gold-light: #E8CD91;
+  --color-gold-muted: #D6B66F;
+  --color-gold-deep: #94691F;
+
+  /* Ivory Backgrounds */
+  --color-ivory: #FFF9E9;
+  --color-cream: #F5EBD2;
+  --color-card: #FFFCF4;
+
+  /* Text */
+  --color-text: #142C4C;
+  --color-text-secondary: #43536A;
+  --color-text-muted: #77766F;
+
+  /* Borders and Shadows */
+  --color-border: #D6B66F;
+  --shadow-soft: 0 8px 24px rgba(16, 39, 70, 0.12);
+
+  /* Gradients */
+  --gradient-navy: linear-gradient(
+    135deg,
+    #071629 0%,
+    #19385D 100%
+  );
+
+  --gradient-gold: linear-gradient(
+    135deg,
+    #94691F 0%,
+    #E8CD91 100%
+  );
+
+  --gradient-ivory: linear-gradient(
+    135deg,
+    #F5EBD2 0%,
+    #FFF9E9 100%
+  );
+}
+
+@theme {
+  /* Royal Navy */
+  --color-navy: #102746;
+  --color-navy-deep: #071629;
+  --color-navy-light: #19385D;
+
+  /* Antique Gold */
+  --color-gold: #B88635;
+  --color-gold-light: #E8CD91;
+  --color-gold-muted: #D6B66F;
+  --color-gold-deep: #94691F;
+
+  /* Ivory Backgrounds */
+  --color-ivory: #FFF9E9;
+  --color-cream: #F5EBD2;
+  --color-card: #FFFCF4;
+
+  /* Text */
+  --color-text: #142C4C;
+  --color-text-secondary: #43536A;
+  --color-text-muted: #77766F;
+
+  /* Borders and Shadows */
+  --color-border: #D6B66F;
+
+  /* Theme mappings for existing classes */
+  --color-blush-main: #071629;      /* Deep Navy */
+  --color-ivory-main: #071629;      /* Deep Navy */
+  --color-blush-light: #102746;     /* Royal Navy */
+  --color-ivory-light: #102746;     /* Royal Navy */
+
+  --color-gold-main: #B88635;
+  --color-gold-antique: #94691F;
+  --color-gold-bright: #E8CD91;
+  --color-gold-champagne: #D6B66F;
+  --color-gold-pattern: #D6B66F;
+  
+  --color-wine-dark: #E8CD91;       /* Antique Bright Gold for titles */
+  --color-burgundy: #E8CD91;        /* Antique Gold */
+  --color-pink-accent: #D6B66F;     /* Muted Gold */
+  --color-pink-border: #D6B66F;     /* Antique Gold Border */
+  --color-text-body: #FFF9E9;       /* Ivory Text */
+
+  --font-script: "Great Vibes", cursive;
+  --font-serif: "Cormorant Garamond", serif;
+  --font-display: "Cinzel", "Playfair Display", "Cormorant Garamond", serif;
+  --font-names: "Playfair Display", "Cinzel", Georgia, serif;
+}
+
+body {
+  @apply bg-[#071629] text-[#FFF9E9] font-serif antialiased overflow-x-hidden;
+}
+
+/* Custom scrollbar in Antique Gold & Royal Navy */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #071629;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #D6B66F;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #B88635;
+}
