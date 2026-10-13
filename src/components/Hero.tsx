@@ -10,7 +10,7 @@ interface HeroProps {
   onToggleDisplayMode?: (mode: "video_with_text" | "photo") => void;
 }
 
-export function Hero({ data, onVideoEnd }: HeroProps) {
+export function Hero({ data, onVideoEnd, shouldPlayVideo = true }: HeroProps) {
   // Royal video card with text is the default presentation
   const [displayMode, setDisplayMode] = useState<"video_with_text" | "photo">(
     data.heroDisplayMode || "video_with_text"
@@ -31,10 +31,24 @@ export function Hero({ data, onVideoEnd }: HeroProps) {
     }
   }, [onVideoEnd]);
 
+  // Manage video play/pause based on shouldPlayVideo
+  useEffect(() => {
+    if (!videoRef.current) return;
+    if (shouldPlayVideo) {
+      videoRef.current.play().catch(() => {
+        // Autoplay may be deferred until user interaction
+      });
+    } else {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }, [shouldPlayVideo]);
+
   // Reveal shading and text after 3 seconds of background video playback
   useEffect(() => {
     if (displayMode === "video_with_text") {
       setIsRevealed(false);
+      if (!shouldPlayVideo) return;
       const timer = setTimeout(() => {
         setIsRevealed(true);
       }, 3000);
@@ -42,7 +56,7 @@ export function Hero({ data, onVideoEnd }: HeroProps) {
     } else {
       setIsRevealed(true);
     }
-  }, [displayMode]);
+  }, [displayMode, shouldPlayVideo]);
 
   const handleTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     if (e.currentTarget.currentTime >= 3 && !isRevealed) {

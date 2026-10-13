@@ -15,7 +15,7 @@ import { Preloader } from './components/Preloader';
 function PublicView() {
   const [data, setData] = useState<WeddingData | null>(null);
   const [isPreloading, setIsPreloading] = useState(false);
-  const [viewState, setViewState] = useState<'thumbnail' | 'opening-video' | 'main'>('main');
+  const [viewState, setViewState] = useState<'thumbnail' | 'opening-video' | 'main'>('thumbnail');
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isHeroEnded, setIsHeroEnded] = useState(true);
   const openingVideoRef = React.useRef<HTMLVideoElement>(null);
@@ -29,11 +29,19 @@ function PublicView() {
         dbData.musicUrl = "https://www.image2url.com/r2/default/audio/1788064469832-bf9b7150-96e8-40a9-aa58-a25cddf491c7.mp3";
       }
 
-      // Ensure royal video card is shown firstly when someone enters the website
+      // Ensure royal video card is active for hero section
       dbData.heroDisplayMode = 'video_with_text';
       
       setData(dbData);
-      setViewState('main');
+
+      // Determine initial view: Opening Thumbnail -> Opening Video -> Main
+      if (dbData.openingThumbnailUrl) {
+        setViewState('thumbnail');
+      } else if (dbData.openingVideoUrl) {
+        setViewState('opening-video');
+      } else {
+        setViewState('main');
+      }
     }
     loadData();
   }, []);
@@ -52,11 +60,31 @@ function PublicView() {
 
     if (data?.openingVideoUrl) {
       setViewState('opening-video');
+      setIsVideoPlaying(false);
       if (openingVideoRef.current) {
-        openingVideoRef.current.play().catch((err) => {
-          console.error("Video playback failed", err);
-          setViewState('main');
-        });
+        openingVideoRef.current.currentTime = 0;
+        openingVideoRef.current.muted = false;
+        const playPromise = openingVideoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsVideoPlaying(true);
+            })
+            .catch(() => {
+              // If unmuted playback is restricted by browser, fallback to muted
+              if (openingVideoRef.current) {
+                openingVideoRef.current.muted = true;
+                openingVideoRef.current.play()
+                  .then(() => setIsVideoPlaying(true))
+                  .catch((err) => {
+                    console.error("Video playback failed", err);
+                    setViewState('main');
+                  });
+              } else {
+                setViewState('main');
+              }
+            });
+        }
       }
     } else {
       setViewState('main');
@@ -105,13 +133,14 @@ function PublicView() {
       <GoldenPetals />
 
       {/* Audio player remains mounted across transitions */}
-      <MusicControl musicUrl={data.musicUrl} shouldPlay={viewState !== 'thumbnail'} />
+      <MusicControl musicUrl={data.musicUrl} shouldPlay={viewState === 'main'} />
 
       {/* Main Content Flow: Very slight gap between sections */}
       <main className="w-full min-h-[100svh] bg-[#071629] relative overflow-hidden pb-3">
         {/* 1. Hero Section (Royal Video Card with Invitation Details) */}
         <Hero 
           data={data} 
+          shouldPlayVideo={viewState === 'main'}
           onVideoEnd={() => setIsHeroEnded(true)}
         />
 
@@ -165,41 +194,58 @@ function PublicView() {
         </footer>
       </main>
 
-      {/* Opening Video Overlay (z-[9999]) */}
+      {/* Opening Video Overlay (z-[9998]) */}
       {data.openingVideoUrl && (
         <div 
-          className={`absolute inset-0 z-[9999] bg-[#071629] flex items-center justify-center ${viewState === 'opening-video' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          className={`absolute inset-0 z-[9998] bg-[#071629] flex items-center justify-center transition-opacity duration-500 ease-in-out ${viewState === 'opening-video' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          onClick={() => setViewState('main')}
         >
           <video
             ref={openingVideoRef}
             src={data.openingVideoUrl}
             playsInline
-            muted
             preload="auto"
-            onLoadedData={() => setIsVideoPlaying(true)}
-            onTimeUpdate={(e) => {
-              if (e.currentTarget.currentTime > 0.1) {
-                setIsVideoPlaying(true);
-              }
+            onLoadedData={() => {
+              if (viewState === 'opening-video') setIsVideoPlaying(true);
             }}
+            onPlaying={() => setIsVideoPlaying(true)}
             onEnded={() => setViewState('main')}
-            onClick={() => setViewState('main')}
             className="w-full h-full object-contain cursor-pointer"
           />
+          {/* Skip button for seamless navigation */}
+          {viewState === 'opening-video' && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setViewState('main');
+              }}
+              className="absolute top-4 right-4 z-[10000] px-3.5 py-1.5 rounded-full bg-[#071629]/80 border border-[#D6B66F]/60 text-[11px] font-serif text-[#FFF9E9] hover:bg-[#102746] backdrop-blur-md transition-all shadow-md cursor-pointer"
+            >
+              Skip &rarr;
+            </button>
+          )}
         </div>
       )}
 
       {/* Thumbnail Overlay (z-[9999]) */}
       {data.openingThumbnailUrl && (
         <div 
-          className={`absolute inset-0 z-[9999] bg-[#071629] flex items-center justify-center cursor-pointer ${viewState === 'thumbnail' || (viewState === 'opening-video' && !isVideoPlaying) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          className={`absolute inset-0 z-[9999] bg-[#071629] flex flex-col items-center justify-center cursor-pointer transition-opacity duration-700 ease-in-out ${viewState === 'thumbnail' || (viewState === 'opening-video' && !isVideoPlaying) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           onClick={handleThumbnailClick}
         >
           <img 
             src={data.openingThumbnailUrl} 
-            alt="Opening" 
+            alt="Opening Invitation" 
             className="w-full h-full object-contain" 
           />
+          {viewState === 'thumbnail' && (
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-5 py-2.5 rounded-full bg-[#071629]/85 border border-[#D6B66F]/60 backdrop-blur-md shadow-2xl flex items-center gap-2.5 pointer-events-none animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-[#E8CD91] animate-ping" />
+              <span className="text-[11px] font-serif tracking-[0.2em] uppercase text-[#FFF9E9] font-medium">
+                Tap to Open Invitation
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
