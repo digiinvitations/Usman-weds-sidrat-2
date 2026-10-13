@@ -139,12 +139,12 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true, theme = 'navy' 
                 className="w-full h-full object-cover object-center scale-105"
               />
 
-              {/* Gradient Shading: appears smoothly after 3 seconds of video */}
+              {/* Gradient Shading: lighter downward shading so lower section is clearly visible */}
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isRevealed ? 1 : 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
-                className={`absolute inset-0 ${isGolden ? 'bg-gradient-to-b from-black/40 via-amber-950/20 to-black/60' : 'bg-gradient-to-b from-[#071629]/55 via-[#102746]/40 to-[#071629]/70'} pointer-events-none`} 
+                className={`absolute inset-0 ${isGolden ? 'bg-gradient-to-b from-black/40 via-amber-950/15 to-black/25' : 'bg-gradient-to-b from-[#071629]/50 via-[#102746]/25 to-[#071629]/30'} pointer-events-none`} 
               />
 
               {/* Slight Warm Gold Ambient Shading to match website color theme */}
@@ -152,12 +152,12 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true, theme = 'navy' 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isRevealed ? 1 : 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
-                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(184,134,53,0.14)_0%,transparent_75%)] pointer-events-none" 
+                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(184,134,53,0.12)_0%,transparent_75%)] pointer-events-none" 
               />
 
-              {/* Downward shading equal in colour & capacity to the message section upward shading */}
+              {/* Decreased downward shading: reduced height and softer gradient opacity */}
               <div 
-                className={`absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent ${isGolden ? 'via-[#FFF9E9]/75 to-[#FFF9E9]' : 'via-[#071629]/75 to-[#071629]'} pointer-events-none z-10`} 
+                className={`absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent ${isGolden ? 'via-[#FFF9E9]/30 to-[#FFF9E9]/65' : 'via-[#071629]/30 to-[#071629]/65'} pointer-events-none z-10`} 
               />
             </div>
 
@@ -352,9 +352,9 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true, theme = 'navy' 
                 />
               </motion.div>
 
-              {/* Subtle top vignette & bottom transition shade matching message section */}
+              {/* Subtle top vignette & decreased bottom transition shade */}
               <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
-              <div className={`absolute bottom-0 inset-x-0 h-40 bg-gradient-to-b from-transparent ${isGolden ? 'via-[#FFF9E9]/75 to-[#FFF9E9]' : 'via-[#071629]/75 to-[#071629]'} pointer-events-none z-10`} />
+              <div className={`absolute bottom-0 inset-x-0 h-24 bg-gradient-to-b from-transparent ${isGolden ? 'via-[#FFF9E9]/30 to-[#FFF9E9]/65' : 'via-[#071629]/30 to-[#071629]/65'} pointer-events-none z-10`} />
             </div>
 
             {/* Spacer */}

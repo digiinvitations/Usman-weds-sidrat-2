@@ -618,7 +618,7 @@ export async function recoverJubairData(): Promise<WeddingData> {
   const jubairSnapshot: WeddingData = {
     ...defaultData,
     heroImageUrl: "https://cdn.phototourl.com/member/2026-10-13-040bf37c-9468-479c-89db-e5ebcc944928.png",
-    ogImageUrl: "https://cdn.phototourl.com/member/2026-10-13-040bf37c-9468-479c-89db-e5ebcc944928.png",
+    ogImageUrl: "https://cdn.phototourl.com/member/2026-10-13-7b264625-1e89-4982-a120-1dea9bc48ed5.png",
     lastUpdated: new Date().toISOString(),
     isRemix: true,
     remixSlotId: currentSlotId,

@@ -22,10 +22,10 @@ export function QuranicVerseSection({ data, theme = 'navy' }: SectionProps) {
       id="quranic-message-section"
       className={`relative px-4 pt-20 pb-8 ${isGolden ? 'bg-[#FFF9E9] text-[#142C4C]' : 'bg-[#071629] text-[#FFF9E9]'} flex flex-col items-center text-center overflow-hidden transition-colors duration-500`}
     >
-      {/* Upward side shading equal in colour & capacity to the hero section downside */}
+      {/* Soft upward blend matching the decreased hero downside shading */}
       <div 
-        className={`absolute inset-x-0 top-0 h-40 bg-gradient-to-b ${
-          isGolden ? 'from-[#FFF9E9] via-[#FFF9E9]/75 to-transparent' : 'from-[#071629] via-[#071629]/75 to-transparent'
+        className={`absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${
+          isGolden ? 'from-[#FFF9E9]/65 via-[#FFF9E9]/30 to-transparent' : 'from-[#071629]/65 via-[#071629]/30 to-transparent'
         } pointer-events-none z-0`} 
       />
       {/* Soft warm gold ambient glow centered behind verse */}

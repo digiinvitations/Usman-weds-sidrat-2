@@ -31,7 +31,7 @@ export const weddingData: WeddingData = {
   heroBrideAddress: "R/o Tamil Nadu",
   heroBlessingMessage: "Your gracious presence and blessings\nwill make the occasion even more special.",
   heroGuestInfo: "1 Gents & 1 Ladies",
-  ogImageUrl: "https://cdn.phototourl.com/member/2026-10-13-040bf37c-9468-479c-89db-e5ebcc944928.png",
+  ogImageUrl: "https://cdn.phototourl.com/member/2026-10-13-7b264625-1e89-4982-a120-1dea9bc48ed5.png",
   heroMessage: "In the name of Allah, Most Gracious, Most Merciful\nWe cordially invite you to celebrate the\nNikah ceremony of",
   customText: "(JM)",
   jmLogoUrl: "https://cdn.phototourl.com/member/2026-10-07-4903dbb7-4f73-4b15-b4ee-ee92614d45a9.png",
