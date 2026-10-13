@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowDown, Film, Image as ImageIcon } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { WeddingData } from "../types";
 
 interface HeroProps {
@@ -10,8 +10,8 @@ interface HeroProps {
   onToggleDisplayMode?: (mode: "video_with_text" | "photo") => void;
 }
 
-export function Hero({ data, onVideoEnd, onToggleDisplayMode }: HeroProps) {
-  // Default to 'video_with_text' as requested, but allow switching to 'photo'
+export function Hero({ data, onVideoEnd }: HeroProps) {
+  // Royal video card with text is the default presentation
   const [displayMode, setDisplayMode] = useState<"video_with_text" | "photo">(
     data.heroDisplayMode || "video_with_text"
   );
@@ -50,14 +50,6 @@ export function Hero({ data, onVideoEnd, onToggleDisplayMode }: HeroProps) {
     }
   };
 
-  const handleToggle = () => {
-    const nextMode = displayMode === "video_with_text" ? "photo" : "video_with_text";
-    setDisplayMode(nextMode);
-    if (onToggleDisplayMode) {
-      onToggleDisplayMode(nextMode);
-    }
-  };
-
   const heroPhoto =
     data.heroImageUrl ||
     data.openingThumbnailUrl ||
@@ -89,35 +81,6 @@ export function Hero({ data, onVideoEnd, onToggleDisplayMode }: HeroProps) {
       onClick={() => { if (!isRevealed) setIsRevealed(true); }}
       className="relative min-h-[100svh] w-full flex flex-col items-center justify-between overflow-hidden bg-[#071629] text-[#FFF9E9]"
     >
-      
-      {/* Mode Switch Button (Top Right Floating) */}
-      <div className="absolute top-3 right-3 z-30">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleToggle();
-          }}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#071629]/75 hover:bg-[#102746] text-[#E8CD91] border border-[#D6B66F]/50 backdrop-blur-md text-[10px] font-sans font-semibold tracking-wider transition-all shadow-md active:scale-95 cursor-pointer"
-          title={
-            displayMode === "video_with_text"
-              ? "Switch to Photo Only Hero"
-              : "Switch to Royal Video & Text Hero Card"
-          }
-        >
-          {displayMode === "video_with_text" ? (
-            <>
-              <ImageIcon className="w-3 h-3 text-[#E8CD91]" />
-              <span>Photo View</span>
-            </>
-          ) : (
-            <>
-              <Film className="w-3 h-3 text-[#E8CD91]" />
-              <span>Royal Video Card</span>
-            </>
-          )}
-        </button>
-      </div>
 
       <AnimatePresence mode="wait">
         {displayMode === "video_with_text" ? (
@@ -369,29 +332,36 @@ export function Hero({ data, onVideoEnd, onToggleDisplayMode }: HeroProps) {
                 />
               </motion.div>
 
-              {/* Subtle top vignette & bottom transition shade */}
+              {/* Subtle top vignette & bottom transition shade matching message section */}
               <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
-              <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#071629] via-[#071629]/80 to-transparent pointer-events-none" />
+              <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-b from-transparent via-[#071629]/75 to-[#071629] pointer-events-none z-10" />
             </div>
 
             {/* Spacer */}
             <div className="relative z-10 w-full pt-8" />
 
-            {/* Animated Floating Scroll Indicator */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 1 }}
-              className="relative z-10 mb-8 flex flex-col items-center justify-center pointer-events-none"
-            >
-              <motion.div
-                animate={{ y: [0, 8, 0] }}
+            {/* Animated Floating Scroll Indicator (Elevated upper to shading for high visibility) */}
+            <div className="relative z-20 mb-8 flex flex-col items-center justify-center pointer-events-auto">
+              <motion.button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const el = document.getElementById("quranic-message-section");
+                  if (el) {
+                    el.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    window.scrollBy({ top: window.innerHeight * 0.8, behavior: "smooth" });
+                  }
+                }}
+                animate={{ y: [0, 6, 0] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                className="w-10 h-10 rounded-full bg-[#102746]/90 backdrop-blur-md shadow-md border border-[#D6B66F] flex items-center justify-center text-[#E8CD91]"
+                className="w-10 h-10 rounded-full bg-[#102746]/95 hover:bg-[#19385D] backdrop-blur-md border border-[#E8CD91] flex items-center justify-center text-[#E8CD91] shadow-[0_4px_16px_rgba(0,0,0,0.6)] cursor-pointer transition-all active:scale-95"
+                title="Scroll to Invitation Message"
+                aria-label="Scroll to Invitation Message"
               >
-                <ArrowDown className="w-5 h-5 text-[#E8CD91]" />
-              </motion.div>
-            </motion.div>
+                <ArrowDown className="w-4 h-4 text-[#E8CD91]" strokeWidth={2.5} />
+              </motion.button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

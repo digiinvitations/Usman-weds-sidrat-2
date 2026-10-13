@@ -29,10 +29,8 @@ function PublicView() {
         dbData.musicUrl = "https://www.image2url.com/r2/default/audio/1788064469832-bf9b7150-96e8-40a9-aa58-a25cddf491c7.mp3";
       }
 
-      // Ensure royal video card is active
-      if (!dbData.heroDisplayMode) {
-        dbData.heroDisplayMode = 'video_with_text';
-      }
+      // Ensure royal video card is shown firstly when someone enters the website
+      dbData.heroDisplayMode = 'video_with_text';
       
       setData(dbData);
       setViewState('main');
@@ -111,13 +109,10 @@ function PublicView() {
 
       {/* Main Content Flow: Very slight gap between sections */}
       <main className="w-full min-h-[100svh] bg-[#071629] relative overflow-hidden pb-3">
-        {/* 1. Hero Section (Switchable between Royal Video Card with Text & Photo Only) */}
+        {/* 1. Hero Section (Royal Video Card with Invitation Details) */}
         <Hero 
           data={data} 
           onVideoEnd={() => setIsHeroEnded(true)}
-          onToggleDisplayMode={(mode) => {
-            setData((prev) => prev ? { ...prev, heroDisplayMode: mode } : prev);
-          }} 
         />
 
         {/* 2. Quranic Verse Section ("And We created you in pairs", Surah An-Naba • 78:8) */}
