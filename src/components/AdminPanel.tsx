@@ -23,6 +23,7 @@ import {
   restoreOfficialMasterData,
   isProtectedOfficialSlot,
   resetToAutomaticSlot,
+  recoverJubairData,
   recoverUsmanData
 } from "../services/db";
 import { WeddingData } from "../types";
@@ -564,25 +565,25 @@ export function AdminPanel() {
 
   const handleUsmanDataRecovery = async () => {
     const confirm = window.confirm(
-      "⚡ usman data recovery\n\n" +
-      "This will recover and ensure the full wedding data for Usman bin Khalid & Sidrat Shafiq Khan (date, Islamic verse, venue, events, countdown, and settings) and sync it for Vercel hosting.\n\n" +
+      "⚡ Jubair Data Recovery\n\n" +
+      "This will recover and ensure the full wedding data for A.Jubair Ali & M.Mugsina Safreen (date, Islamic verse, venue, events, countdown, settings, and new hero photo) and sync it for Vercel hosting.\n\n" +
       "Proceed with data recovery?"
     );
     if (!confirm) return;
 
     setSaving(true);
     try {
-      const recovered = await recoverUsmanData();
+      const recovered = await recoverJubairData();
       setData(recovered);
       setCurrentSlot(getEnvironmentDocId());
       alert(
-        "✅ 'usman data recovery' Completed Successfully!\n\n" +
-        "• Groom: Usman bin Khalid\n" +
-        "• Bride: Sidrat Shafiq Khan\n" +
+        "✅ Data Recovery Completed Successfully!\n\n" +
+        "• Groom: A.Jubair Ali\n" +
+        "• Bride: M.Mugsina Safreen\n" +
         "• Date: November 15, 2026 (Nikah Ceremony)\n" +
-        "• Scratch Hearts & Countdown: Activated\n" +
+        "• Hero Section Photo: Updated & Synced\n" +
         "• Venue & Islamic Blessings: Synced\n\n" +
-        "Your wedding data is now completely saved and recovered for Vercel hosting!"
+        "Your wedding data is now completely saved and recovered!"
       );
     } catch (err) {
       console.error("Failed to recover data:", err);
@@ -652,10 +653,10 @@ export function AdminPanel() {
               disabled={saving}
               type="button"
               className="flex items-center gap-1.5 bg-gradient-to-r from-[#B87919] to-[#98520C] text-white px-3 py-2 rounded-lg hover:brightness-110 transition-all text-xs font-bold uppercase tracking-wider shadow-sm disabled:opacity-50 cursor-pointer"
-              title="Recover all wedding data for Usman bin Khalid & Sidrat Shafiq Khan"
+              title="Recover all wedding data for A.Jubair Ali & M.Mugsina Safreen"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#F3E2B8]" />
-              usman recovery
+              recover data
             </button>
 
             <button 
@@ -864,7 +865,7 @@ export function AdminPanel() {
                   onClick={() => { switchToCurrentWebsiteSlot(); window.location.reload(); }}
                   className="bg-[#13243F] border border-slate-600 text-[#E8CD91] px-2.5 py-1 rounded text-xs hover:bg-[#1c365f] transition-colors font-medium"
                 >
-                  Target Current Website (Pt-2 / Usman)
+                  Target Current Website (Pt-2 / Jubair)
                 </button>
                 <button
                   type="button"

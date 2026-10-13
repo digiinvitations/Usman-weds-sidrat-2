@@ -352,39 +352,26 @@ export function extractMediaFilesDictionary(data: WeddingData) {
   };
 }
 
-function ensureUsmanAndSidratData(data: WeddingData): WeddingData {
-  const groomName = (!data.groom?.name || data.groom.name.includes("Jubair")) ? "Usman bin Khalid" : data.groom.name;
-  const brideName = (!data.bride?.name || data.bride.name.includes("Mugsina")) ? "Sidrat Shafiq Khan" : data.bride.name;
-  const customText = (!data.customText || data.customText.includes("JM")) ? "(US)" : data.customText;
-  const closingMessage = data.closingMessage || defaultData.closingMessage || "May Allah bless our union.\nWe look forward to celebrating\nthis blessed journey with you!\nPlease keep us in your prayers.";
+function cleanAndMergeData(data: WeddingData): WeddingData {
   return {
+    ...defaultData,
     ...data,
     groom: {
-      ...data.groom,
-      name: groomName,
-      parents: data.groom?.parents || "S/o Mr. Khalid Majeed"
+      ...defaultData.groom,
+      ...(data.groom || {})
     },
     bride: {
-      ...data.bride,
-      name: brideName,
-      parents: data.bride?.parents || "D/o Mr. Mohammad Shafiq Khan"
+      ...defaultData.bride,
+      ...(data.bride || {})
     },
-    heroDisplayMode: data.heroDisplayMode || "video_with_text",
-    heroInvitationBy: data.heroInvitationBy || "Dr. Abdul Majeed",
-    heroInvitationMessage: data.heroInvitationMessage || "Cordially invites you to join for lunch\non the auspicious occasion of the",
-    heroHeading: data.heroHeading || "Nikah Ceremony",
-    heroOccasionDetails: data.heroOccasionDetails || "Of His Beloved Grandson",
-    heroGroomFather: data.heroGroomFather || data.groom?.parents || "S/o Mr. Khalid Majeed",
-    heroBrideFather: data.heroBrideFather || data.bride?.parents || "D/o Mr. Mohammad Shafiq Khan",
-    heroBrideAddress: data.heroBrideAddress || "R/o Al Farooq Colony, Sanat Nagar",
-    heroBlessingMessage: data.heroBlessingMessage || "Your gracious presence and blessings\nwill make the occasion even more special.",
-    heroGuestInfo: data.heroGuestInfo || "1 Gents & 1 Ladies",
-    heroVideoUrl: data.heroVideoUrl || defaultData.heroVideoUrl || "https://www.image2url.com/r2/default/videos/1788011182513-3d74480d-c3ef-41df-926f-d21988765de3.mp4",
-    openingThumbnailUrl: data.openingThumbnailUrl || defaultData.openingThumbnailUrl || "https://cdn.phototourl.com/member/2026-10-13-4d95056f-808f-438a-a87d-b923a3073f87.png",
-    openingVideoUrl: data.openingVideoUrl || defaultData.openingVideoUrl || "https://videotourl.com/videos/1791863422409-e1b895a9-4737-40fd-a055-b9fe88922013.mp4",
+    heroDisplayMode: data.heroDisplayMode || defaultData.heroDisplayMode || "video_with_text",
+    heroImageUrl: data.heroImageUrl || defaultData.heroImageUrl || "https://cdn.phototourl.com/member/2026-10-13-040bf37c-9468-479c-89db-e5ebcc944928.png",
+    openingThumbnailUrl: data.openingThumbnailUrl || defaultData.openingThumbnailUrl,
+    openingVideoUrl: data.openingVideoUrl || defaultData.openingVideoUrl,
+    heroVideoUrl: data.heroVideoUrl || defaultData.heroVideoUrl,
     colorTheme: data.colorTheme || defaultData.colorTheme || 'navy',
-    customText,
-    closingMessage
+    customText: data.customText || defaultData.customText || "(JM)",
+    closingMessage: data.closingMessage || defaultData.closingMessage
   };
 }
 
@@ -410,7 +397,7 @@ export async function getWeddingData(): Promise<WeddingData> {
       // Priority 1: dedicated isolated data field
       if (rawData.remix_isolated_data) {
         const isolated = rawData.remix_isolated_data as WeddingData;
-        return ensureUsmanAndSidratData({
+        return cleanAndMergeData({
           ...defaultData,
           ...isolated,
           templateName: THIS_REMIX_TEMPLATE_NAME,
@@ -423,7 +410,7 @@ export async function getWeddingData(): Promise<WeddingData> {
       // Priority 2: remix_4260_2_data (present in existing document)
       if (rawData.remix_4260_2_data) {
         const isolated = rawData.remix_4260_2_data as WeddingData;
-        return ensureUsmanAndSidratData({
+        return cleanAndMergeData({
           ...defaultData,
           ...isolated,
           templateName: THIS_REMIX_TEMPLATE_NAME,
@@ -436,7 +423,7 @@ export async function getWeddingData(): Promise<WeddingData> {
       // Priority 3: remix_pt2_data
       if (rawData.remix_pt2_data) {
         const isolated = rawData.remix_pt2_data as WeddingData;
-        return ensureUsmanAndSidratData({
+        return cleanAndMergeData({
           ...defaultData,
           ...isolated,
           templateName: THIS_REMIX_TEMPLATE_NAME,
@@ -448,7 +435,7 @@ export async function getWeddingData(): Promise<WeddingData> {
 
       // Fallback: document root
       const existing = rawData as WeddingData;
-      return ensureUsmanAndSidratData({
+      return cleanAndMergeData({
         ...defaultData,
         ...existing,
         templateName: THIS_REMIX_TEMPLATE_NAME,
@@ -473,7 +460,7 @@ export async function getWeddingData(): Promise<WeddingData> {
         console.warn("Could not fetch seed document, using default data.", seedErr);
       }
 
-      const initialData: WeddingData = ensureUsmanAndSidratData({
+      const initialData: WeddingData = cleanAndMergeData({
         ...initialSeed,
         isRemix: true,
         remixSlotId: slotId,
@@ -514,7 +501,7 @@ export async function saveWeddingData(data: WeddingData): Promise<void> {
     slotId = THIS_REMIX_SLOT_ID;
   }
 
-  const basePayload: WeddingData = ensureUsmanAndSidratData({
+  const basePayload: WeddingData = cleanAndMergeData({
     ...data,
     lastUpdated: new Date().toISOString(),
     isRemix: true,
@@ -622,97 +609,52 @@ export async function restoreOfficialMasterData(): Promise<WeddingData> {
 }
 
 /**
- * 'usman data recovery': Restores and guarantees full wedding data for Usman bin Khalid & Sidrat Shafiq Khan.
- * Specifically built so when deployed on Vercel hosting (or any custom domain), clicking this button:
- * 1) Recovers the complete wedding data snapshot (names, dates, countdown, Islamic verse, venue, events, media URLs, closing message).
- * 2) Saves into the current active slot (including Vercel domain slot) AND the dedicated remix slot in Firestore.
- * 3) Cleans up any outdated local slots to ensure perfect syncing on Vercel.
+ * 'recoverJubairData': Restores and guarantees full wedding data for A.Jubair Ali & M.Mugsina Safreen.
+ * Restores the complete wedding data snapshot (names, dates, countdown, Islamic verse, venue, events, media URLs, closing message, and new hero photo).
  */
-export async function recoverUsmanData(): Promise<WeddingData> {
+export async function recoverJubairData(): Promise<WeddingData> {
   const currentSlotId = getEnvironmentDocId();
   
-  // Clean, complete data snapshot for Usman bin Khalid & Sidrat Shafiq Khan
-  const usmanSnapshot: WeddingData = {
+  const jubairSnapshot: WeddingData = {
     ...defaultData,
-    groom: {
-      name: "Usman bin Khalid",
-      parents: "S/o Mr. Khalid Majeed",
-      profession: "",
-      education: ""
-    },
-    bride: {
-      name: "Sidrat Shafiq Khan",
-      parents: "D/o Mr. Mohammad Shafiq Khan",
-      profession: "",
-      education: ""
-    },
-    heroDisplayMode: "video_with_text",
-    heroInvitationBy: "Dr. Abdul Majeed",
-    heroInvitationMessage: "Cordially invites you to join for lunch\non the auspicious occasion of the",
-    heroHeading: "Nikah Ceremony",
-    heroOccasionDetails: "Of His Beloved Grandson",
-    heroGroomFather: "S/o Mr. Khalid Majeed",
-    heroBrideFather: "D/o Mr. Mohammad Shafiq Khan",
-    heroBrideAddress: "R/o Al Farooq Colony, Sanat Nagar",
-    heroBlessingMessage: "Your gracious presence and blessings\nwill make the occasion even more special.",
-    heroGuestInfo: "1 Gents & 1 Ladies",
-    customText: "(US)",
-    closingMessage: "May Allah bless our union.\nWe look forward to celebrating\nthis blessed journey with you!\nPlease keep us in your prayers.",
-    weddingDate: "2026-11-15T11:30",
-    weddingDateFormatted: "November 15, 2026",
-    weddingTimeFormatted: "11:30 AM",
-    weddingDayFormatted: "Sunday",
+    heroImageUrl: "https://cdn.phototourl.com/member/2026-10-13-040bf37c-9468-479c-89db-e5ebcc944928.png",
+    ogImageUrl: "https://cdn.phototourl.com/member/2026-10-13-040bf37c-9468-479c-89db-e5ebcc944928.png",
     lastUpdated: new Date().toISOString(),
     isRemix: true,
     remixSlotId: currentSlotId,
-    templateName: REMIX_PT2_TEMPLATE_NAME
+    templateName: THIS_REMIX_TEMPLATE_NAME
   };
 
-  // Try to preserve any existing user uploaded media if already configured in current doc
-  try {
-    const existingSnap = await getDoc(doc(db, "weddingConfig", currentSlotId));
-    if (existingSnap.exists()) {
-      const ext = existingSnap.data();
-      const source = ext.remix_pt2_data || ext;
-      if (source.heroImageUrl) usmanSnapshot.heroImageUrl = source.heroImageUrl;
-      if (source.jmLogoUrl) usmanSnapshot.jmLogoUrl = source.jmLogoUrl;
-      if (source.musicUrl) usmanSnapshot.musicUrl = source.musicUrl;
-      if (source.venue?.mapUrl) usmanSnapshot.venue = source.venue;
-    }
-  } catch (e) {
-    console.warn("Could not read existing doc during recovery, proceeding with clean snapshot:", e);
-  }
-
   // Save to current slot
-  await saveWeddingData(usmanSnapshot);
+  await saveWeddingData(jubairSnapshot);
 
   // Also write directly to THIS_REMIX_SLOT_ID if on Vercel or external domain to guarantee cross-environment sync
   if (currentSlotId !== THIS_REMIX_SLOT_ID && !isProtectedOfficialSlot(THIS_REMIX_SLOT_ID)) {
     try {
-      const mediaFiles = extractMediaFilesDictionary(usmanSnapshot);
+      const mediaFiles = extractMediaFilesDictionary(jubairSnapshot);
       await setDoc(doc(db, "weddingConfig", THIS_REMIX_SLOT_ID), {
-        ...usmanSnapshot,
+        ...jubairSnapshot,
         remixSlotId: THIS_REMIX_SLOT_ID,
         remix_isolated: true,
         remix_isolated_slot: THIS_REMIX_SLOT_ID,
-        remix_isolated_data: { ...usmanSnapshot, remixSlotId: THIS_REMIX_SLOT_ID },
+        remix_isolated_data: { ...jubairSnapshot, remixSlotId: THIS_REMIX_SLOT_ID },
         remix_isolated_files: mediaFiles,
-        remix_isolated_events: usmanSnapshot.events || [],
-        remix_isolated_family: usmanSnapshot.familyDetails || {},
-        remix_isolated_timeline: usmanSnapshot.timeline || [],
-        remix_isolated_venue: usmanSnapshot.venue || {},
+        remix_isolated_events: jubairSnapshot.events || [],
+        remix_isolated_family: jubairSnapshot.familyDetails || {},
+        remix_isolated_timeline: jubairSnapshot.timeline || [],
+        remix_isolated_venue: jubairSnapshot.venue || {},
         remix_isolated_metadata: {
           appletId: CURRENT_APPLET_ID,
           templateName: THIS_REMIX_TEMPLATE_NAME,
           slotId: THIS_REMIX_SLOT_ID,
           recoveredAt: new Date().toISOString(),
-          recoveryAction: "usman data recovery",
+          recoveryAction: "jubair data recovery",
           zeroOverlapGuaranteed: true
         },
         // Mirror fields for backward compatibility
-        remix_4260_2_data: { ...usmanSnapshot, remixSlotId: THIS_REMIX_SLOT_ID },
+        remix_4260_2_data: { ...jubairSnapshot, remixSlotId: THIS_REMIX_SLOT_ID },
         remix_4260_2_media_files: mediaFiles,
-        remix_pt2_data: { ...usmanSnapshot, remixSlotId: THIS_REMIX_SLOT_ID },
+        remix_pt2_data: { ...jubairSnapshot, remixSlotId: THIS_REMIX_SLOT_ID },
         remix_pt2_media_files: mediaFiles
       });
     } catch (crossErr) {
@@ -720,8 +662,10 @@ export async function recoverUsmanData(): Promise<WeddingData> {
     }
   }
 
-  return usmanSnapshot;
+  return jubairSnapshot;
 }
+
+export const recoverUsmanData = recoverJubairData;
 
 export async function submitRSVP(rsvpData: any): Promise<void> {
   const collectionName = getRsvpCollectionName();

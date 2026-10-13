@@ -76,17 +76,17 @@ export function Hero({ data, onVideoEnd, shouldPlayVideo = true, theme = 'navy' 
     "https://www.image2url.com/r2/default/videos/1788011182513-3d74480d-c3ef-41df-926f-d21988765de3.mp4";
 
   // Data fields with requested defaults
-  const invitationBy = data.heroInvitationBy || "Dr. Abdul Majeed";
+  const invitationBy = data.heroInvitationBy || "N.Abdul Kadher & Family";
   const invitationMessage =
     data.heroInvitationMessage ||
     "Cordially invites you to join for lunch\non the auspicious occasion of the";
   const mainHeading = data.heroHeading || "Nikah Ceremony";
-  const occasionDetails = data.heroOccasionDetails || "Of His Beloved Grandson";
-  const groomName = data.groom?.name || "Usman bin Khalid";
-  const groomFather = data.heroGroomFather || data.groom?.parents || "S/o Mr. Khalid Majeed";
-  const brideName = data.bride?.name || "Sidrat Shafiq Khan";
-  const brideFather = data.heroBrideFather || data.bride?.parents || "D/o Mr. Mohammad Shafiq Khan";
-  const brideAddress = data.heroBrideAddress || "R/o Al Farooq Colony, Sanat Nagar";
+  const occasionDetails = data.heroOccasionDetails || "Of Their Beloved Son";
+  const groomName = data.groom?.name || "A.Jubair Ali";
+  const groomFather = data.heroGroomFather || data.groom?.parents || "Son of N.Abdul Kadher & A.Barakathu Nisha";
+  const brideName = data.bride?.name || "M.Mugsina Safreen";
+  const brideFather = data.heroBrideFather || data.bride?.parents || "Daughter of M.Mansoor Ali & M.Sameem Banu";
+  const brideAddress = data.heroBrideAddress || "R/o Tamil Nadu";
   const blessingMessage =
     data.heroBlessingMessage ||
     "Your gracious presence and blessings\nwill make the occasion even more special.";

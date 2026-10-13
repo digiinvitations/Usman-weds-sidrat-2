@@ -81,15 +81,15 @@ export function QuranicVerseSection({ data, theme = 'navy' }: SectionProps) {
  */
 export function ClosingBlessingAndLogo({ data, message, theme = 'navy' }: SectionProps) {
   const isGolden = theme === 'golden';
-  const customText = data?.customText || "(US)";
+  const customText = data?.customText || "(JM)";
   const invitationMsg = message || data?.invitationMessage || "بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ\nMay Allah bless you and send blessings upon you. and bring goodness between you.";
 
   const lines = invitationMsg.split("\n");
   const arabicLine = lines[0] || "بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ";
   const englishLine = lines.slice(1).join("\n") || "May Allah bless you and send blessings upon you. and bring goodness between you.";
 
-  const groomName = data?.groom?.name || "Usman bin Khalid";
-  const brideName = data?.bride?.name || "Sidrat Shafiq Khan";
+  const groomName = data?.groom?.name || "A.Jubair Ali";
+  const brideName = data?.bride?.name || "M.Mugsina Safreen";
 
   const defaultClosingPrayer = "May Allah bless this union with eternal love, harmony, and happiness.\nPlease remember us in your precious prayers.";
   const closingLine = data?.closingMessage || defaultClosingPrayer;
